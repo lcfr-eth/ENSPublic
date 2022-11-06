@@ -74,6 +74,11 @@ Step 2 - transferTo the token from the compromised wallet to the rescuer wallet.
 
 Step 3 - execute & pay for the transaction using sponsored transaction from the rescuer wallet via block.coinbase
 
+# Install
+python3 -m venv env
+pip install web3py
+pip install flashbots
+
 # usage example
 ```commandline
 ENSRescue.py --name hero --hacked-key AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA --rescuer-key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
