@@ -65,8 +65,8 @@ The real magic that allows us to save tokens is the bundle functionality + spons
 the bundle from another wallet besides the compromised wallet. Not the fact that the transactions are "private".
 
 
-# Plan of counter attack
-This means, we can create a bundle of 3 transactions to accomplish this which will all be executed as if they were a single transaction in a single block.
+# Counter Attack
+With the knowledge of bundles in hand we can create a bundle of 3 transactions to accomplish this which will all be executed as if they were a single transaction in a single block.
 
 TX 1 - send eth from another wallet to the compromised wallet to cover block baseFee.
 
