@@ -1,10 +1,12 @@
-#
 # ENS Flashbots Rescue script (sponsored transaction)
 # https://twitter.com/nicksdjohnson/status/1527065045678452736
 #
-# can be used to rescue a single name or provide a list of up to 28 names
-# to rescue in a single transaction.
-
+# --hacked-key is the private key for the hacked address
+# --rescuer-key is the private key for the address which has funds and is not compromised.
+# --auto will return all names owned by --hacked-key from thegraph
+# --name will rescue a single name
+# --names-file will rescue the names listed in the file if owned by --hacked-key public address.
+# 
 # lcfr.eth
 
 from web3 import Web3, HTTPProvider
@@ -15,7 +17,7 @@ from web3.middleware import geth_poa_middleware
 from flashbots import flashbot
 from ast import literal_eval
 
-import argparse, os, json, math
+import argparse, os, json, math, requests
 
 class ENSRescue:
     def __init__(self, args):
@@ -29,6 +31,7 @@ class ENSRescue:
         self.rescuer_key = args.rescuer_key
         self.hacked_key = args.hacked_key
         self.names_file = args.names_file
+        self.auto_rescue = args.get_all_names
         self.provider = os.getenv("NODE")
         self.rescuer_account = args.rescuer_account
         # Account with funds for the rescue operation
@@ -36,12 +39,14 @@ class ENSRescue:
         self.ETH_ACCOUNT: LocalAccount = Account.from_key(self.rescuer_key)
         self.HACK_ACCOUNT: LocalAccount = Account.from_key(self.hacked_key)
 
+        self.thegraph_api = "https://api.thegraph.com/subgraphs/name/ensdomains/ens"
 
         self.ENS_BASE_REGISTRAR = "0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85"
 
         if self.test_net:
             os.environ["FLASHBOTS_HTTP_PROVIDER_URI"] = "https://relay-goerli.flashbots.net"
             self.provider = f"https://goerli.infura.io/v3/yourkeyherelol" #goerli
+            self.thegraph_api = "https://api.thegraph.com/subgraphs/name/ensdomains/ensgoerli"
             print("[+] testnet enabled, connected to goerli infura node.")
             self.chainID = 5
 
@@ -62,8 +67,26 @@ class ENSRescue:
             abi=self.br_abi_json
         )
 
+        self.chainID = 1
         flashbot(self.w3, self.ETH_ACCOUNT)
         self.flashbots = self.w3.flashbots
+        
+
+    def get_all_names(self):
+        query = """{
+account(id: "HACKED") {
+      domains(first: 1000, skip: 0) {
+        labelName
+        labelhash
+        name
+      }
+    }
+}""".replace("HACKED", self.HACK_ACCOUNT.address.lower())
+
+        names = requests.post(self.thegraph_api, '', json={'query': query})
+        ret = json.loads(names.text)
+        domains = ret['data']['account']['domains']
+        return domains
 
     def derive_token_from_name(self, name):
         return literal_eval(Web3.keccak(text=name).hex())
@@ -120,13 +143,13 @@ class ENSRescue:
         nonce_hack = self.w3.eth.getTransactionCount(self.HACK_ACCOUNT.address)
         nonce_rescue = self.w3.eth.getTransactionCount(self.ETH_ACCOUNT.address)
 
-        if len(names) > 28:
-            print(". Bundle can only hold 28 name transactions and found > 28 Names")
-            return
+        #if len(names) > 28:
+        #    print(". Bundle can only hold 28 name transactions and found > 28 Names")
+        #    return
 
         # loop names and do estimateGas() on transferFrom method to get the total gas cost we need to send the account.
         self.w3.eth.default_account = self.HACK_ACCOUNT.address
-        for idx, name in enumerate(names):
+        for name in names:
             estimate = self.ENS_REGISTRAR.functions.transferFrom(self.HACK_ACCOUNT.address, self.ETH_ACCOUNT.address, name).estimateGas()
             base_fee = self.w3.eth.fee_history(1, 'latest')
             gas_total = estimate * math.floor(base_fee["baseFeePerGas"][1] * self.basefee_premium)
@@ -145,7 +168,7 @@ class ENSRescue:
         bundle_txs.append(fund_tx)
         rescue_tx_cnt += 1
 
-        for idx, name in enumerate(names):
+        for name in names:
             base_fee = self.w3.eth.fee_history(1, 'latest')
             rescue_tx = self.blank_tx()
             rescue_tx["transaction"]["nonce"] = nonce_hack + hack_tx_cnt
@@ -208,7 +231,15 @@ class ENSRescue:
 
         print(f"[+] sending rescued names to: {self.rescuer_account}.")
 
+        if self.auto_rescue:
+            print("[+] Auto Rescuing all names!")
+            userAllNames = self.get_all_names()
+            for name in userAllNames:
+                print(f"[+] Found {name['name']}")
+                names.append(literal_eval(name['labelhash']))
+
         if self.names_file:
+            print("[+] Loading names from file.")
             name_list = open("./"+self.names_file, 'r').read()
             temp = name_list.split("\n")
             for name in temp:
@@ -223,7 +254,7 @@ class ENSRescue:
             names.append(token_id)
 
         if len(names) > 0:
-            #print("doing rescue lol")
+            print("[+] Performing rescue operation")
             self.rescue(names)
         else:
             exit("[-] No names or file-path of names provided to rescue!")
@@ -232,8 +263,12 @@ class ENSRescue:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="ENSRescue - lcfr.eth (6/22)\n")
 
+    parser.add_argument("--auto", dest="get_all_names", action='store_true',
+                        help="Return/Rescue all names automatically owned by an address.",
+                        default=False)
+
     parser.add_argument("--name", dest="target_name", type=str,
-                        help="Target ENS name to purchase. or use --names-file for file/list of names.",
+                        help="Target specific ENS name to rescue. Or use --names-file for file/list of names.",
                         default=None)
 
     parser.add_argument("--hacked-key", dest="hacked_key",  type=str,
