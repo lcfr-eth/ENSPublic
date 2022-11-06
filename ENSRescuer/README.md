@@ -80,7 +80,7 @@ source ./env/bin/activate
 pip install web3py  
 pip install flashbots  
 
-# usage example
+# Usage Example
 
 use --auto to return all names owned by a compromised key and rescue all of them. 
 
