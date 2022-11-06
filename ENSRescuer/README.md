@@ -68,11 +68,11 @@ the bundle from another wallet besides the compromised wallet. Not the fact that
 # Plan of counter attack
 This means, we can create a bundle of 3 transactions to accomplish this which will all be executed as if they were a single transaction in a single block.
 
-Step 1 - send eth from another wallet to the compromised wallet to cover block baseFee.
+TX 1 - send eth from another wallet to the compromised wallet to cover block baseFee.
 
-Step 2 - transferTo the token from the compromised wallet to the rescuer wallet.
+TX 2 - transferTo the token from the compromised wallet to the rescuer wallet.
 
-Step 3 - execute & pay for the transaction using sponsored transaction from the rescuer wallet via block.coinbase
+TX 3 - execute & pay for the transaction using sponsored transaction from the rescuer wallet via block.coinbase
 
 # Install
 python3 -m venv env  
@@ -81,8 +81,10 @@ pip install web3py
 pip install flashbots  
 
 # usage example
-```commandline
+
 use --auto to return all names owned by a compromised key and rescue all of them. 
+
+```commandline
 
 ENSRescuer.py --auto --hacked-key=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA --rescuer-key=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -96,9 +98,11 @@ ENSRescuer.py --auto --hacked-key=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 [+] Bundle broad casted at block 15913188
 ..
 [+] Transaction confirmed at block 15913188 [flashbots]
+```
 
-Rescuing a specific name - hero.eth
+Rescuing a specific name - hero.eth  
 
+```commandline
 ENSRescue.py --name hero --hacked-key AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA --rescuer-key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 [+] testnet enabled, connected to goerli infura node.
 [+] rescuing names from: 0x59a02AA24367b293902002f1Df1F5D55e76B5b4C.
