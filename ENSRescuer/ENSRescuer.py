@@ -113,7 +113,7 @@ account(id: "HACKED") {
                 "maxFeePerGas": 0,
                 "maxPriorityFeePerGas": 0,
                 'gas': 0,  
-                'to': self.w3.toChecksumAddress(self.ENS_BASE_REGISTRAR), # change to ENS address
+                'to': self.w3.toChecksumAddress(self.ENS_BASE_REGISTRAR),
                 "data": "",
                 },
             }
