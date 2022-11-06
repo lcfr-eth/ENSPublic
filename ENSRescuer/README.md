@@ -76,6 +76,7 @@ Step 3 - execute & pay for the transaction using sponsored transaction from the 
 
 # Install
 python3 -m venv env  
+source ./env/bin/activate  
 pip install web3py  
 pip install flashbots  
 
