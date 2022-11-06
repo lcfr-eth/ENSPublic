@@ -86,6 +86,8 @@ use --auto to return all names owned by a compromised key and rescue all of them
 
 ```commandline
 
+export NODE=https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4XXX
+
 ENSRescuer.py --auto --hacked-key=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA --rescuer-key=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 [+] rescuing names from: 0xd175B9609d20B6A0A8297945c8339a0D571EECEa.
@@ -103,6 +105,8 @@ ENSRescuer.py --auto --hacked-key=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 Rescuing a specific name - hero.eth  
 
 ```commandline
+export NODE=https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4XXX
+
 ENSRescue.py --name hero --hacked-key AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA --rescuer-key xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 [+] testnet enabled, connected to goerli infura node.
 [+] rescuing names from: 0x59a02AA24367b293902002f1Df1F5D55e76B5b4C.
